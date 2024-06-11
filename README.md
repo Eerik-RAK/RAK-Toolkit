@@ -6,14 +6,14 @@ $ComboBoxObject=[System.Windows.Forms.ComboBox]
 
 $DefaultFont='Verdana,12'
 
-# Setup base form
+#Setup base form
 $AppForm=New-Object $FormObject
 $AppForm.ClientSize='500,300'
-$AppForm.Text='Eerik - Service Inspector'
+$AppForm.Text='Eerik - Service  Inspector'
 $AppForm.BackColor='#ffffff'
 $AppForm.Font=$DefaultFont
 
-# GUI
+#GUI
 $LabelService=New-Object $LabelObject
 $LabelService.Text='Services :'
 $LabelService.AutoSize=$true
@@ -23,9 +23,9 @@ $ComboBoxService=New-Object $ComboBoxObject
 $ComboBoxService.Width='300'
 $ComboBoxService.Location=New-Object System.Drawing.Point(110,20)
 
-# Load the drop down list for services
+#Load the drop down list for services
 Get-Service | ForEach-Object {$ComboBoxService.Items.Add($_.Name)}
-$ComboBoxService.Text='Pick a Service'
+$ComboBoxService.text='Pick a Service'
 
 $LabelForName=New-Object $LabelObject
 $LabelForName.Text='Services Friendly name :'
@@ -49,29 +49,28 @@ $LabelStatus.Location=New-Object System.Drawing.Point(100,120)
 
 $AppForm.Controls.AddRange(@($LabelService,$ComboBoxService,$LabelForName,$LabelName,$LabelForStatus,$LabelStatus))
 
-# Functions
-Function GetServiceDetails {
+#Functions
+Function GetServiceDetails{
     $ServiceName=$ComboBoxService.SelectedItem
-    if ($ServiceName) {
-        $Details=Get-Service -Name $ServiceName | Select-Object DisplayName, Status
-        $LabelName.Text=$Details.DisplayName
-        $LabelStatus.Text=$Details.Status.ToString()
-        
-        if ($LabelStatus.Text -eq 'Running') {
-            $LabelStatus.ForeColor='Green'
-        } elseif ($LabelStatus.Text -eq 'Stopped') {
-            $LabelStatus.ForeColor='Red'
-        } else {
-            $LabelStatus.ForeColor='Black'
-        }
+    $Details=Get-Service -Name $ServiceName | Select *
+    $LabelName.Text=$Details.name
+    $LabelStatus.Text=$Details.status
+
+    if($LabelStatus.Text -eq 'Running'){
+        $LabelStatus.ForeColor='Green'
     }
+    if($LabelStatus.Text -eq 'Stopped'){
+        $LabelStatus.ForeColor='Red'
+    }
+   
 }
 
-# Add Functions to the controls
+#Add Functions to the controls
+
 $ComboBoxService.Add_SelectedIndexChanged({GetServiceDetails})
 
-# Show the form
+#Show the form
 $AppForm.ShowDialog()
 
-# Garbage Collection
+#Garbage Collection
 $AppForm.Dispose()
