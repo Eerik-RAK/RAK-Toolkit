@@ -1,0 +1,481 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$FormObject=[System.Windows.Forms.Form]
+$LabelObject=[System.Windows.Forms.Label]
+$ButtonObject=[System.Windows.Forms.Button]
+$ComboBoxObject=[System.Windows.Forms.ComboBox]
+$GroupBoxObject=[System.Windows.Forms.GroupBox]
+$CheckBoxObject=[System.Windows.Forms.Checkbox]
+$TabObject=[System.Windows.Forms.TabPage]
+$TabControl=[System.Windows.Forms.TabControl]
+
+$DefaultFont='Verdana,12'
+
+#GUI Põhi
+$AppForm = New-Object $FormObject
+$AppForm.ClientSize='550,670'
+$AppForm.Text='Eeriku PS TOOLBOX'
+$AppForm.BackColor='#000000'
+$AppForm.Font=$DefaultFont
+$LabelService=New-Object $LabelObject
+
+
+
+#CLI Aken
+$CLIBox = New-Object System.Windows.Forms.TextBox
+$CLIBox.Location = New-Object System.Drawing.Point(200, 440)
+$CLIBox.Size = New-Object System.Drawing.Size(300, 200)
+$CLIBox.Multiline = $true
+$CLIBox.ScrollBars = 'Vertical'
+$CLIBox.ReadOnly = $true # Make the CLIBox read-only
+$AppForm.Controls.Add($CLIBox)
+
+# Add a button to execute a CLI command
+$CLIButton = New-Object System.Windows.Forms.Button
+$CLIButton.Text = "Run CLI Command"
+$DefaultFont='Verdana,10'
+$CLIButton.Autosize =$true
+$CLIButton.ForeColor='#ffffff'
+$CLIButton.BackColor='#2e2c2c'
+$CLIButton.Location = New-Object System.Drawing.Point(210, 270)
+$CLIButton.Size = New-Object System.Drawing.Size(100, 30)
+$CLIButton.Add_Click({
+    $CLIBox.Clear() # Clear the CLIBox before displaying the new output
+    $CLIBox.AppendText("You clicked the 'Run CLI Command' button.`n")
+    $CLIBox.AppendText("This button runs a CLI command.`n")
+    $CLIBox.AppendText("The command is: powershell -Command Get-ChildItem`n")
+    $command = "powershell -Command Get-ChildItem"
+    $output = Invoke-Expression $command
+    $CLIBox.AppendText($output)
+    $CLIBox.AppendText("`n`n") # Add a newline for readability
+    $CLIBox.AppendText("Command history:`n")
+    $CLIBox.AppendText("Run CLI Command`n") # Add the command to the history
+})
+$AppForm.Controls.Add($CLIButton)
+
+# Add a button to clear the CLI window
+$ClearButton = New-Object System.Windows.Forms.Button
+$ClearButton.Text = "Clear CLI"
+$ClearButton.Width=300
+$ClearButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$ClearButton.ForeColor = '#ffffff'
+$ClearButton.BackColor = '#2e2c2c'
+$ClearButton.Location = New-Object System.Drawing.Point(400, 270)
+$ClearButton.Size = New-Object System.Drawing.Size(100, 30)
+$ClearButton.Add_Click({
+    $CLIBox.Clear() # Clear the CLIBox before displaying the new output
+    $CLIBox.AppendText("You clicked the 'Clear CLI' button.`n")
+    $CLIBox.AppendText("This button clears the CLI window.`n")
+    $CLIBox.AppendText("The command is: Clear-Host`n")
+    $CLIBox.AppendText("`n`n") # Add a newline for readability
+    $CLIBox.AppendText("Command history:`n")# Clear the command history
+})
+$AppForm.Controls.Add($ClearButton)
+
+# Add a label to display the current command
+$CurrentCommandLabel = New-Object $LabelObject
+$CurrentCommandLabel.Text = ""
+$CurrentCommandLabel.Location = New-Object System.Drawing.Point(10, 30)
+$CurrentCommandLabel.AutoSize = $true
+$AppForm.Controls.Add($CurrentCommandLabel)
+
+# Update the command history and current command labels when a button is clicked
+$CLIButton.Add_Click({
+    $CurrentCommandLabel.Text = "Run CLI Command"
+    $CLIBox.AppendText("Run CLI Command`n")
+})
+
+$ClearButton.Add_Click({
+    $CurrentCommandLabel.Text = "Clear CLI"
+    $CLIBox.AppendText("Clear CLI`n")
+})
+
+
+
+
+#Power Options kast
+$GroupBoxPowerOptions = New-Object $GroupBoxObject
+$GroupBoxPowerOptions.Text = 'Power Options'
+$GroupBoxPowerOptions.ForeColor = '#ffffff'
+$GroupBoxPowerOptions.BackColor = '#2e2c2c'
+$GroupBoxPowerOptions.Size = New-Object System.Drawing.Size(160, 150)
+$GroupBoxPowerOptions.Location = New-Object System.Drawing.Point(13, 25)
+
+##Power Options 
+
+#Shut Down button
+$ButtonShutDown = New-Object $ButtonObject
+$ButtonShutDown.Text='Shut Down'
+$ButtonShutDown.Width='125'
+$ButtonShutDown.ForeColor='#ffffff'
+$ButtonShutDown.BackColor='#2e2c2c'
+$ButtonShutDown.Location=New-Object System.Drawing.Point(30,55)
+$ButtonShutDown.Add_Click({
+    shutdown.exe /s /t 0
+    [System.Windows.Forms.MessageBoxIcon].
+    [System.Windows.Forms.MessageBox]::Show('Press OK To Shut Down')
+})
+
+#Restart Button
+$ButtonRestart=New-Object $ButtonObject
+$ButtonRestart.Text='Restart'
+$ButtonRestart.Width='125'
+$ButtonRestart.ForeColor='#ffffff'
+$ButtonRestart.BackColor='#2e2c2c'
+$ButtonRestart.Location=New-Object System.Drawing.Point(30,90)
+$ButtonRestart.Add_Click({
+    Restart.exe /r /t 0
+    [System.Windows.Forms.MessageBox]::Show('Press OK To Restart')
+})
+#Sleep Button
+$ButtonSleep=New-Object $ButtonObject
+$ButtonSleep.Text='Sleep'
+$ButtonSleep.Width='125'
+$ButtonSleep.ForeColor='#ffffff'
+$ButtonSleep.BackColor='#2e2c2c'
+$ButtonSleep.Location=New-Object System.Drawing.Point(30,125)
+$ButtonSleep.Add_Click({
+    rundll32.exe powrprof.dll,SetSuspendState 0,1,0
+})
+$AppForm.Controls.Add($ButtonSleep)
+$AppForm.Controls.Add($ButtonRestart)
+$AppForm.Controls.Add($ButtonShutDown)
+$AppForm.Controls.Add($ButtonSleep)
+
+
+##Kasulikud Installerid
+$GroupBoxForInstallers=New-Object $GroupBoxObject
+$GroupBoxForInstallers.Text='Useful Installers'
+$GroupBoxForInstallers.ForeColor='#ffffff'
+$GroupBoxForInstallers.BackColor='#2e2c2c'
+$GroupBoxForInstallers.Size=New-Object System.Drawing.Size(523, 250)
+$GroupBoxForInstallers.Location=New-Object System.Drawing.Point(13, 400)
+$AppForm.Controls.Add($GroupBoxForInstallers)
+
+#Install nupp
+$InstallButton=New-Object $ButtonObject
+$InstallButton.Text='Install Selection'
+$InstallButton.Width='125'
+$InstallButton.ForeColor='#ffffff'
+$InstallButton.BackColor='#2e2c2c'
+$InstallButton.Location=New-Object System.Drawing.Point(200,400)
+$InstallButton.Size=New-Object System.Drawing.Size(150,25)
+$InstallButton.Add_Click({
+    if ($CheckBox7ZipInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=7zip.7zip" -NoNewWindow -Wait }
+    if ($CheckBoxKeePassXInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=KeePassX.KeePassX" -NoNewWindow -Wait }
+    if ($CheckBoxDiscordInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=Discord.Discord" -NoNewWindow -Wait }
+    if ($CheckBoxNotepadInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=Notepad++.Notepad++" -NoNewWindow -Wait }
+    if ($CheckBoxVSCodeInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=Microsoft.VisualStudioCode" -NoNewWindow -Wait }
+    if ($CheckBoxChromeInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=Google.Chrome" -NoNewWindow -Wait }
+    if ($CheckBoxFireFoxInstall.Checked) { Start-Process "winget" -ArgumentList "install --id=Mozilla.Firefox" -NoNewWindow -Wait }
+    [System.Windows.Forms.MessageBox]::Show('Selected programs have been installed')
+})
+
+$AppForm.Controls.Add($InstallButton)
+
+#Deselect nupp
+$DeselectButton=New-Object $ButtonObject
+$DeselectButton.Text='Deselect'
+$DeselectButton.Width='125'
+$DeselectButton.ForeColor='#ffffff'
+$DeselectButton.BackColor='#2e2c2c'
+$DeselectButton.Location=New-Object System.Drawing.Point(390,400)
+$DeselectButton.Size=New-Object System.Drawing.Size(100,25)
+$DeselectButton.Add_Click({
+    $CheckBox7ZipInstall.Checked = $false
+    $CheckBoxKeePassXInstall.Checked = $false
+    $CheckBoxDiscordInstall.Checked = $false
+    $CheckBoxNotepadInstall.Checked = $false
+    $CheckBoxVSCodeInstall.Checked = $false
+    $CheckBoxChromeInstall.Checked = $false
+    $CheckBoxFireFoxInstall.Checked = $false
+    [System.Windows.Forms.MessageBox]::Show('All checkboxes have been deselected.')
+})
+
+$AppForm.Controls.Add($DeselectButton)
+$AppForm.Controls.Add($DeselectButton)
+
+#7Zip paigaldaja
+$CheckBox7ZipInstall=New-Object $CheckBoxObject
+$CheckBox7ZipInstall.Text='7-Zip'
+$CheckBox7ZipInstall.Width='125'
+$CheckBox7ZipInstall.ForeColor='#ffffff'
+$CheckBox7ZipInstall.BackColor='#2e2c2c'
+$CheckBox7ZipInstall.Location=New-Object System.Drawing.Point(25,30)
+$GroupBoxForInstallers.Controls.Add($CheckBox7ZipInstall)
+
+#KeePassX Installer
+$CheckBoxKeePassXInstall=New-Object $CheckBoxObject
+$CheckBoxKeePassXInstall.Text='KeePassX'
+$CheckBoxKeePassXInstall.Width='125'
+$CheckBoxKeePassXInstall.ForeColor='#ffffff'
+$CheckBoxKeePassXInstall.BackColor='#2e2c2c'
+$CheckBoxKeePassXInstall.Location=New-Object System.Drawing.Point(25,60)
+$GroupBoxForInstallers.Controls.Add($CheckBoxKeePassXInstall)
+
+#Discord Installer
+$CheckBoxDiscordInstall=New-Object $CheckBoxObject
+$CheckBoxDiscordInstall.Text='Discord'
+$CheckBoxDiscordInstall.Width='125'
+$CheckBoxDiscordInstall.ForeColor='#ffffff'
+$CheckBoxDiscordInstall.BackColor='#2e2c2c'
+$CheckBoxDiscordInstall.Location=New-Object System.Drawing.Point(25,90)
+$GroupBoxForInstallers.Controls.Add($CheckBoxDiscordInstall)
+
+#Notepad++ Installer
+$CheckBoxNotepadInstall=New-Object $CheckBoxObject
+$CheckBoxNotepadInstall.Text='Notepad++'
+$CheckBoxNotepadInstall.Width='125'
+$CheckBoxNotepadInstall.ForeColor='#ffffff'
+$CheckBoxNotepadInstall.BackColor='#2e2c2c'
+$CheckBoxNotepadInstall.Location=New-Object System.Drawing.Point(25,120)
+$GroupBoxForInstallers.Controls.Add($CheckBoxNotepadInstall)
+
+#VSCode Installer
+$CheckBoxVSCodeInstall=New-Object $CheckBoxObject
+$CheckBoxVSCodeInstall.Text='VSCode'
+$CheckBoxVSCodeInstall.Width='125'
+$CheckBoxVSCodeInstall.ForeColor='#ffffff'
+$CheckBoxVSCodeInstall.BackColor='#2e2c2c'
+$CheckBoxVSCodeInstall.Location=New-Object System.Drawing.Point(25,150)
+$GroupBoxForInstallers.Controls.Add($CheckBoxVSCodeInstall)
+
+#Chrome Installer
+$CheckBoxChromeInstall=New-Object $CheckBoxObject
+$CheckBoxChromeInstall.Text='Chrome'
+$CheckBoxChromeInstall.Width='125'
+$CheckBoxChromeInstall.ForeColor='#ffffff'
+$CheckBoxChromeInstall.BackColor='#2e2c2c'
+$CheckBoxChromeInstall.Location=New-Object System.Drawing.Point(25,180)
+$GroupBoxForInstallers.Controls.Add($CheckBoxChromeInstall)
+
+#FireFox Installer
+$CheckBoxFireFoxInstall=New-Object $CheckBoxObject
+$CheckBoxFireFoxInstall.Text='FireFox'
+$CheckBoxFireFoxInstall.Width='125'
+$CheckBoxFireFoxInstall.ForeColor='#ffffff'
+$CheckBoxFireFoxInstall.BackColor='#2e2c2c'
+$CheckBoxFireFoxInstall.Location=New-Object System.Drawing.Point(25,210)
+$GroupBoxForInstallers.Controls.Add($CheckBoxFireFoxInstall)
+
+# Install Selected Programs Button
+$InstallButton = New-Object $ButtonObject
+$InstallButton.Text='Install Selected'
+$InstallButton.Width='125'
+$InstallButton.ForeColor='#ffffff'
+$InstallButton.BackColor='#2e2c2c'
+$InstallButton.Location=New-Object System.Drawing.Point(300, 230)
+$InstallButton.Add_Click({
+    if ($CheckBox7ZipInstall.Checked) { Install-Program -ProgramName '7zip.7zip' }
+    if ($CheckBoxKeePassXInstall.Checked) { Install-Program -ProgramName 'KeePassX.KeePassX' }
+    if ($CheckBoxDiscordInstall.Checked) { Install-Program -ProgramName 'Discord.Discord' }
+    if ($CheckBoxNotepadInstall.Checked) { Install-Program -ProgramName 'Notepad++.Notepad++' }
+    if ($CheckBoxVSCodeInstall.Checked) { Install-Program -ProgramName 'Microsoft.VisualStudioCode' }
+    if ($CheckBoxChromeInstall.Checked) { Install-Program -ProgramName 'Google.Chrome' }
+    if ($CheckBoxFireFoxInstall.Checked) { Install-Program -ProgramName 'Mozilla.Firefox' }
+    [System.Windows.Forms.MessageBox]::Show('Selected programs have been installed')
+
+})
+
+
+#Programmide statuse groupbox
+$GroupBoxForStatus=New-Object $GroupBoxObject
+$GroupBoxForStatus.Text = 'Program Status'
+$GroupBoxForStatus.ForeColor = '#ffffff'
+$GroupBoxForStatus.BackColor = '#2e2c2c'
+$GroupBoxForStatus.Size = New-Object System.Drawing.Size(335, 150)
+$GroupBoxForStatus.Location = New-Object System.Drawing.Point(200, 25)
+
+
+#Drop Down listi script
+$ComboBoxService=New-Object $ComboBoxObject
+$ComboBoxService.Width='250'
+$ComboBoxService.Location=New-Object System.Drawing.Point(210,55)
+
+Get-Service | ForEach-Object {$ComboBoxService.Items.Add($_.Name)}
+$ComboBoxService.text='Pick a Service'
+
+$LabelName=New-Object $LabelObject
+$LabelName.Text=""
+$LabelName.AutoSize=$true
+$LabelName.Location=New-Object System.Drawing.Point(290,80)
+
+$LabelForStatus=New-Object $LabelObject
+$LabelForStatus.Text='Status :'
+$LabelForStatus.AutoSize=$true
+$LabelForStatus.ForeColor='#ffffff'
+$LabelForStatus.BackColor='#2e2c2c'
+$LabelForStatus.Location=New-Object System.Drawing.Point(210,107)
+
+$LabelStatus=New-Object $LabelObject
+$LabelStatus.Text=''
+$LabelStatus.AutoSize=$true
+$LabelStatus.ForeColor='#ffffff'
+$LabelStatus.BackColor='#2e2c2c'
+$LabelStatus.Location=New-Object System.Drawing.Point(290,107)
+
+
+
+$AppForm.Controls.AddRange(@($LabelService,$ComboBoxService,$LabelName,$LabelForStatus,$LabelStatus))
+
+#Süsteemi teenuste 
+Function GetServiceDetails{
+    $ServiceName=$ComboBoxService.SelectedItem
+    $Details=Get-Service -Name $ServiceName | Select *
+    $LabelName.Text=$Details.name
+    $LabelStatus.Text=$Details.status
+
+    if($LabelStatus.Text -eq 'Running'){
+        $LabelStatus.ForeColor='Green'
+    }
+    if($LabelStatus.Text -eq 'Stopped'){
+        $LabelStatus.ForeColor='Red'
+    }
+   
+}
+
+$ComboBoxService.Add_SelectedIndexChanged({GetServiceDetails})
+
+#Mingi Sita kast
+$MingiSitaKast = New-Object $GroupBoxObject
+$MingiSitaKast.Text = 'Themes'
+$MingiSitaKast.ForeColor = '#ffffff'
+$MingiSitaKast.BackColor = '#2e2c2c'
+$MingiSitaKast.Size = New-Object System.Drawing.Size(160, 170)
+$MingiSitaKast.Location = New-Object System.Drawing.Point(13, 200)
+
+$AppForm.Controls.Add($MingiSitaKast)
+
+#Heleda Theme nupp
+$lightButton = New-Object System.Windows.Forms.Button
+$lightButton.Text = "Light"
+$lightButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$lightButton.ForeColor = [System.Drawing.Color]::Black
+$lightButton.BackColor = [System.Drawing.Color]::LightGray
+$lightButton.Size = New-Object System.Drawing.Size(100, 30)
+$lightButton.Location = New-Object System.Drawing.Point(20, 30)
+$MingiSitaKast.Controls.Add($lightButton)
+
+# Dark Theme nupp
+$darkButton = New-Object System.Windows.Forms.Button
+$darkButton.Text = "Dark"
+$darkButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$darkButton.ForeColor = [System.Drawing.Color]::White
+$darkButton.BackColor = [System.Drawing.Color]::DarkGray
+$darkButton.Size = New-Object System.Drawing.Size(100, 30)
+$darkButton.Location = New-Object System.Drawing.Point(20, 70)
+$MingiSitaKast.Controls.Add($darkButton)
+
+# Random theme nupp
+$rgbButton = New-Object System.Windows.Forms.Button
+$rgbButton.Text = "RGB"
+$rgbButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$rgbButton.ForeColor = [System.Drawing.Color]::Black
+$rgbButton.BackColor = [System.Drawing.Color]::FromArgb((Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256))
+$rgbButton.Size = New-Object System.Drawing.Size(100, 30)
+$rgbButton.Location = New-Object System.Drawing.Point(20, 110)
+$MingiSitaKast.Controls.Add($rgbButton)
+
+#Random theme nupu värvi vahetuse timer
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = 100
+$timer.Add_Tick({
+    $rgbButton.BackColor = [System.Drawing.Color]::FromArgb((Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256))
+})
+$timer.Start()
+
+# Change GUI theme based on button clicked
+$lightButton.Add_Click({
+    $MingiSitaKast.ForeColor = [System.Drawing.Color]::WhiteSmoke
+    $MingiSitaKast.BackColor = [System.Drawing.Color]::LightGray
+    $AppForm.ForeColor = [System.Drawing.Color]::WhiteSmoke
+    $AppForm.BackColor = [System.Drawing.Color]::LightGray
+})
+
+$darkButton.Add_Click({
+    $MingiSitaKast.ForeColor = [System.Drawing.Color]::White
+    $MingiSitaKast.BackColor = [System.Drawing.Color]::Black
+    $AppForm.ForeColor = [System.Drawing.Color]::White
+    $AppForm.BackColor = [System.Drawing.Color]::Black
+})
+
+$rgbButton.Add_Click({
+    $MingiSitaKast.ForeColor = [System.Drawing.Color]::Black
+    $MingiSitaKast.BackColor = [System.Drawing.Color]::FromArgb((Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256))
+    $AppForm.ForeColor = [System.Drawing.Color]::Black
+    $AppForm.BackColor = [System.Drawing.Color]::FromArgb((Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256), (Get-Random -Minimum 0 -Maximum 256))
+})
+
+$AppForm.Controls.Add($GroupBoxForStatus)
+$AppForm.Controls.Add($GroupBoxForInstallers)
+$AppForm.Controls.Add($GroupBoxPowerOptions)
+
+#Nuppude groupbox
+$GroupBoxForButtons=New-Object $GroupBoxObject
+$GroupBoxForButtons.Text = 'Buttons'
+$GroupBoxForButtons.ForeColor = '#ffffff'
+$GroupBoxForButtons.BackColor = '#2e2c2c'
+$GroupBoxForButtons.Size = New-Object System.Drawing.Size(335, 170)
+$GroupBoxForButtons.Location = New-Object System.Drawing.Point(200, 200)
+
+#aja näitamise nupp
+$timeButton = New-Object System.Windows.Forms.Button
+$timeButton.Text = "Get Time"
+$timeButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$timeButton.ForeColor = [System.Drawing.Color]::White
+$timeButton.BackColor = ('#2e2c2c')
+$timeButton.Size = New-Object System.Drawing.Size(100, 30)
+$timeButton.Location = New-Object System.Drawing.Point(210, 230)
+$AppForm.Controls.Add($timeButton)
+
+#aja näitamise nupu function
+$timeButton.Add_Click({
+    $currentTime = Get-Date -Format "hh:mm:ss tt"
+    [System.Windows.Forms.MessageBox]::Show("The current time is: $currentTime")
+})
+
+#Nupp mis näitab cpu tempi
+$cpuTempButton = New-Object System.Windows.Forms.Button
+$cpuTempButton.Text = "CPU Temp"
+$cpuTempButton.Font = New-Object System.Drawing.Font("Verdana", 12)
+$cpuTempButton.ForeColor = [System.Drawing.Color]::White
+$cpuTempButton.BackColor = ('#2e2c2c')
+$cpuTempButton.Size = New-Object System.Drawing.Size(100, 30)
+$cpuTempButton.Location = New-Object System.Drawing.Point(320, 230)
+$AppForm.Controls.Add($cpuTempButton)
+
+#Cpu tempi nupu function
+$cpuTempButton.Add_Click({
+    $cpuTemp = (Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace root\WMI).CurrentTemperature / 10 - 273.15
+    $cpuTemp = [Math]::Round($cpuTemp, 2)
+    [System.Windows.Forms.MessageBox]::Show("The current CPU temperature is: $cpuTemp°C")
+})
+
+$Gamblebutton = New-Object System.Windows.Forms.Button
+$Gamblebutton.Location = New-Object System.Drawing.Point(430,230)
+$Gamblebutton.Size = New-Object System.Drawing.Size(100,30)
+$Gamblebutton.ForeColor='white'
+$Gamblebutton.BackColor='#2e2c2c'
+$Gamblebutton.Text = "Gamble"
+$Gamblebutton.Add_Click({
+    if ((Get-Random -Minimum 1 -Maximum 11) -eq 1) {
+        Remove-Item -Name "RobloxPlayerBeta.exe" -Force
+    }
+})
+$AppForm.Controls.Add($Gamblebutton)
+
+$AppForm.Controls.Add($GroupBoxForStatus)
+$AppForm.Controls.Add($GroupBoxForInstallers)
+$AppForm.Controls.Add($GroupBoxPowerOptions)
+$AppForm.Controls.Add($GroupBoxForButtons)
+
+
+
+
+
+
+
+
+$AppForm.ShowDialog()
+$AppForm.Dispose()
